@@ -11,7 +11,6 @@ import CreateNewItem from "../components/CreateNewItem";
 export default function TodoListPage() {
     const {data, action} = useTodoList({
         initialData: StorageHelper.getTodoList(),
-        sortType: SortType.ASC,
         onSuccessAction: (items) => {
             StorageHelper.setTodoList(items)
         }

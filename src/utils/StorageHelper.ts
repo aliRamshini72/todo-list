@@ -1,8 +1,10 @@
-import {TodoModel} from "../models/todo.model";
+import { SortType } from "../hooks/useTodoList";
+import { TodoModel } from "../models/todo.model";
 
 
 enum StorageKey {
-    TODO_LIST = 'todo_list'
+    TODO_LIST = 'todo_list',
+    SORT_TYPE_TODO = 'todo_list_sort'
 }
 
 
@@ -21,4 +23,12 @@ export class StorageHelper {
         localStorage.setItem(StorageKey.TODO_LIST, JSON.stringify(items))
     }
 
+    public static getSortType(): SortType {
+        const str = localStorage.getItem(StorageKey.SORT_TYPE_TODO)
+        if (str) return str as SortType
+        return SortType.ASC
+    }
+    public static setSortType(type: SortType): void {
+        localStorage.setItem(StorageKey.SORT_TYPE_TODO, type)
+    }
 }

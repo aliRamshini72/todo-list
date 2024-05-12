@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {TodoModel, TodoStatusEnum} from "../models/todo.model";
 import {Utility} from "../utils/Utility";
+import { StorageHelper } from "../utils/StorageHelper";
 
 export enum SortType {
     ASC = 'ascending',
@@ -23,13 +24,14 @@ interface UseTodoListReturn {
 interface UseTodoListEntry {
     initialData: TodoModel[],
     onSuccessAction: (items: TodoModel[]) => void,
-    sortType: SortType
+    
 }
 
 export default function useTodoList(entry: UseTodoListEntry): UseTodoListReturn {
-    const {initialData, sortType, onSuccessAction} = entry;
+    const {initialData, onSuccessAction} = entry;
     const [data, setData] = useState<TodoModel[]>(initialData);
     const [filterData, setFilterData] = useState<TodoModel[]>(data);
+    const [sortType , setSortType] = useState<SortType | null>(null)
     const add = (item: Omit<TodoModel, 'id' | 'createAt'>) => {
         const date = new Date().getTime();
         const id = Utility.generateUniqueId();
