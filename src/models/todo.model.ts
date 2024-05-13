@@ -12,5 +12,9 @@ export interface TodoModel {
     desc : string ,
     status : TodoStatusEnum ,
     createAt : number ,
-    // sort : number
+}
+
+export enum SortType {
+    ASC = 'ascending',
+    DESC = 'descending'
 }

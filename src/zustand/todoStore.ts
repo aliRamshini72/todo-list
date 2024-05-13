@@ -1,10 +1,8 @@
-import { create } from 'zustand';
-import { createJSONStorage, devtools, persist } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import { TodoModel, TodoStatusEnum } from '../models/todo.model';
-import { SortType } from '../hooks/useTodoList';
-import { Utility } from '../utils/Utility';
-
+import {create} from 'zustand';
+import {createJSONStorage, devtools, persist} from 'zustand/middleware';
+import {immer} from 'zustand/middleware/immer';
+import {SortType, TodoModel, TodoStatusEnum} from '../models/todo.model';
+import {Utility} from '../utils/Utility';
 
 
 export interface State {
@@ -16,11 +14,13 @@ export interface Action {
     add: (item: Pick<TodoModel, 'label' | 'desc'>) => void,
     remove: (id: string) => void,
     complete: (id: string, status: TodoStatusEnum) => void
-    sort: (sortType: SortType) => void,
+    sort: () => void,
     deleteCompleted: () => void,
-    changeSortType: () => void
+    updateList : (list: TodoModel[]) => void
 }
-export interface Store extends State, Action { }
+
+export interface Store extends State, Action {
+}
 
 export const initialState: State = {
     todoList: [],
@@ -28,54 +28,57 @@ export const initialState: State = {
 };
 
 export const actions = (set: any): Action => {
-    const add = (item: Omit<TodoModel, 'id' | 'createAt'>) => {
+    const add = (item: Pick<TodoModel , 'label' | 'desc'>) => {
         const date = new Date().getTime();
         const id = Utility.generateUniqueId();
-        const newItem = { ...item, createAt: date, id, status: TodoStatusEnum.ACTIVE } as TodoModel;
+        const newItem = {...item, createAt: date, id, status: TodoStatusEnum.ACTIVE} as TodoModel;
         set((state: State) => {
-            if (state.sortType === SortType.ASC) return [...state.todoList, newItem]
-            return [newItem, ...state.todoList]
+            if (state.sortType === SortType.ASC) return {...state, todoList: [...state.todoList, newItem]}
+            return {...state, todoList: [newItem, ...state.todoList]}
         }, false, 'add_todo')
     }
 
     const remove = (id: string) => {
         set((state: State) => {
-            return state.todoList.filter(item => item.id !== id)
+            return {...state, todoList: state.todoList.filter(item => item.id !== id)}
         }, false, 'remove_todo')
     }
 
     const complete = (id: string, status: TodoStatusEnum) => {
         set((state: State) => {
-            return state.todoList.map((el) => {
+            const newList = state.todoList.map((el) => {
                 if (el.id === id) {
-                    return { ...el, status };
+                    return {...el, status};
                 }
                 return el;
             })
+            return {...state, todoList: newList}
         }, false, 'complete_todo')
     }
     const deleteCompleted = () => {
         set((state: State) => {
-            return state.todoList.filter(i => i.status !== TodoStatusEnum.COMPLETED);
+            return {...state, todoList: state.todoList.filter(i => i.status !== TodoStatusEnum.COMPLETED)};
         }, false, 'remove_completed')
     }
-    const sort = (sortType: SortType) => {
+    const sort = () => {
         set((state: State) => {
-            return state.todoList.sort((a, b) => {
-                if (state.sortType === SortType.ASC)
+            const newList = [...state.todoList];
+            newList.sort((a, b) => {
+                if (state.sortType === SortType.DESC)
                     return a.createAt - b.createAt
                 return b.createAt - a.createAt
             })
+            return {sortType: state.sortType === SortType.DESC ? SortType.ASC : SortType.DESC, todoList: newList}
         }, false, 'sort_todo')
     }
-    const changeSortType = (() => {
-        set((state: State) => {
-            if (state.sortType === SortType.ASC) return SortType.DESC
-            else return SortType.ASC
-        }, false, 'change_sort_type')
-    })
 
-    return { add, remove, complete, deleteCompleted, sort, changeSortType }
+    const updateList = (list: TodoModel[]) => {
+        set((state: State) => {
+                return {todoList: list}
+        }, false, 'drag_drop_todo')
+    }
+
+    return {add, remove, complete, deleteCompleted, sort , updateList}
 
 };
 
