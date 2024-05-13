@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 
 
 const options: any = {
@@ -11,7 +12,7 @@ const options: any = {
 }
 export class Utility {
     public static generateUniqueId  () : string  {
-        return Math.ceil(Math.random() * Date.now()).toPrecision(16).toString().replace(".", "")
+        return uuid()
     }
     public static formatDate (time : number) : string {
         return new Intl.DateTimeFormat('en', options).format(new Date(time))

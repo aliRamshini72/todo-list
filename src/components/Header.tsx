@@ -4,13 +4,14 @@ interface HeaderProps {
     createNewItem : () => void ,
     sort : () => void ,
     deleteCompleted : () => void ,
-    filterCompleted : (isCompleted : boolean) => void
+    filterCompleted : (isCompleted : boolean) => void ,
+    showCompleted : boolean
 }
 
 const Header : FC<HeaderProps> = (props) => {
-    const {createNewItem , sort , deleteCompleted , filterCompleted} = props
+    const {createNewItem , sort , deleteCompleted , filterCompleted , showCompleted} = props
     return (
-        <div className={'sticky top-0 border-neutral-400 border-b border-solid'}>
+        <div className={'border-neutral-400 border-b border-solid'}>
             <h1 className={'text-center p-2 bg-sky-300'}>
                 Todo List Application
             </h1>
@@ -31,9 +32,10 @@ const Header : FC<HeaderProps> = (props) => {
                     delete completed
                 </button>
                 <input
-                    onChange={(event )=> filterCompleted(Boolean(event.target.value))}
+                    onChange={(event )=> filterCompleted(Boolean(event.target.checked))}
                     type={"checkbox"}
                     className={'h-6 w-6'}
+                    checked={showCompleted}
                 />
             </div>
         </div>
